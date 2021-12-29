@@ -7,6 +7,8 @@ BLUE = (50, 50, 255)
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
+Vector = pygame.Vector2
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -19,31 +21,29 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = x
 
         self.speed = 3
-        self.change_x = 0
-        self.change_y = 0
+        self.velocity = Vector(0, 0)
         self.walls = None
 
 
     def change_speed(self, x, y):
-        self.change_x += x
-        self.change_y += y
+        self.velocity.x += x
+        self.velocity.y += y
 
-    # TODO: Try to loop through block hit list only once
     def update(self):
-        self.rect.x += self.change_x
+        self.rect.x += self.velocity.x
 
         block_hit_list = pygame.sprite.spritecollide(self, self.walls, False)
         for block in block_hit_list:
-            if self.change_x > 0:
+            if self.velocity.x > 0:
                 self.rect.right = block.rect.left
             else:
                 self.rect.left = block.rect.right
 
-        self.rect.y += self.change_y
+        self.rect.y += self.velocity.y
     
         block_hit_list = pygame.sprite.spritecollide(self, self.walls, False)
         for block in block_hit_list:
-            if self.change_y > 0:
+            if self.velocity.y > 0:
                 self.rect.bottom = block.rect.top
             else:
                 self.rect.top = block.rect.bottom
