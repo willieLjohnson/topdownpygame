@@ -1,21 +1,12 @@
 import pygame
 from config import Style
 from player import Player
+from game_objects import Wall
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
 Vector = pygame.Vector2
-
-class Wall(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height):
-        super().__init__()
-        self.image = pygame.Surface([width, height])
-        self.image.fill(Style.BLUE)
-        
-        self.rect = self.image.get_rect()
-        self.rect.y = y
-        self.rect.x = x
 
 pygame.init()
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
