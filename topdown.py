@@ -23,8 +23,7 @@ class Game:
         self._add_enemy(50, 100)
         self._add_enemy(100, 100) 
 
-        self.player = Player(50, 50)
-        self.player.walls = self.walls
+        self.player = Player(self, 50, 50)
         self.player.enemies = self.enemies
         self.gameobjects.add(self.player)
         
@@ -35,7 +34,6 @@ class Game:
         while self.running:
             self._handle_input()
                  
-            self.player.update()      
             self.gameobjects.update()
             
             self.screen.fill(Style.BLACK)     
@@ -83,6 +81,8 @@ class Game:
                     elif event.key == pygame.K_s:
                         self.player.move(0, -self.player.speed)
     
+    def get_gameobjects(self):
+        return [*self.walls, *self.enemies]
     
 Game().run()               
             

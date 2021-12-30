@@ -35,18 +35,18 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.velocity.x
 
-        block_hit_list = pygame.sprite.spritecollide(self, self.walls, False)
-        for block in block_hit_list:
-            if self.velocity.x > 0:
-                self.rect.right = block.rect.left
-            else:
-                self.rect.left = block.rect.right
+        # block_hit_list = pygame.sprite.spritecollide(self, self.walls, False)
+        # for block in block_hit_list:
+        #     if self.velocity.x > 0:
+        #         self.rect.right = block.rect.left
+        #     else:
+        #         self.rect.left = block.rect.right
 
-        self.rect.y += self.velocity.y
+        # self.rect.y += self.velocity.y
     
-        block_hit_list = pygame.sprite.spritecollide(self, self.walls, False)
-        for block in block_hit_list:
-            if self.velocity.y > 0:
-                self.rect.bottom = block.rect.top
-            else:
-                self.rect.top = block.rect.bottom
+        # block_hit_list = pygame.sprite.spritecollide(self, self.walls, False)
+        # for block in block_hit_list:
+        #     if self.velocity.y > 0:
+        #         self.rect.bottom = block.rect.top
+        #     else:
+        #         self.rect.top = block.rect.bottom

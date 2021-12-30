@@ -4,8 +4,10 @@ from config import Style
 Vector = pygame.Vector2
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, game, x, y):
         super().__init__()
+        
+        self.game = game
         
         self.image = pygame.Surface([15, 15])
         self.image.fill(Style.WHITE)
@@ -16,18 +18,14 @@ class Player(pygame.sprite.Sprite):
 
         self.speed = 3
         self.velocity = Vector(0, 0)
-        self.walls = None
-        self.enemies = None
-
-
+        
     def move(self, x, y):
         self.velocity.x += x
         self.velocity.y += y
 
     def update(self):
         self.rect.x += self.velocity.x
-        self._handle_enemy_collision()
-        self._handle_wall_collision()
+        self._handle_gameobject_collision()
 
     def _handle_enemy_collision(self):
         enemies_hit = pygame.sprite.spritecollide(self, self.enemies, False)
@@ -47,20 +45,20 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.rect.top = enemy.rect.bottom 
                 
-    def _handle_wall_collision(self):
-        walls_hit = pygame.sprite.spritecollide(self, self.walls, False)
+    def _handle_gameobject_collision(self):
+        gameobjects_collided = pygame.sprite.spritecollide(self, self.game.get_gameobjects(), False)
         
-        for block in walls_hit:
+        for gameobject in gameobjects_collided:
             if self.velocity.x > 0:
-                self.rect.right = block.rect.left
+                self.rect.right = gameobject.rect.left
             else:
-                self.rect.left = block.rect.right
+                self.rect.left = gameobject.rect.right
 
         self.rect.y += self.velocity.y
     
-        walls_hit = pygame.sprite.spritecollide(self, self.walls, False)
-        for block in walls_hit:
+        gameobjects_collided = pygame.sprite.spritecollide(self, self.game.get_gameobjects(), False)
+        for gameobject in gameobjects_collided:
             if self.velocity.y > 0:
-                self.rect.bottom = block.rect.top
+                self.rect.bottom = gameobject.rect.top
             else:
-                self.rect.top = block.rect.bottom
+                self.rect.top = gameobject.rect.bottom
