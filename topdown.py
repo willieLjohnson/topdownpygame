@@ -1,7 +1,7 @@
 import pygame
 from config import *
 from player import Player
-from game_objects import Wall
+from game_objects import Wall, Enemy
 
 Vector = pygame.Vector2
 
@@ -30,6 +30,10 @@ class Game:
         self.player = Player(50, 50)
         self.player.walls = self.walls
         self.gameobjects.add(self.player)
+        
+        self.enemy = Enemy(50, 100)
+        self.enemy.walls = self.walls
+        self.gameobjects.add(self.enemy)
         
 
     def run(self):
