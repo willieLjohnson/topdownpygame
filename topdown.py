@@ -14,37 +14,32 @@ class Game:
 
         self.gameobjects = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
+        self.enemies = pygame.sprite.Group()
+        
+        self._add_wall(0, 0, 10, 600)
+        self._add_wall(10, 0, 790, 10)
+        self._add_wall(10, 200, 100, 10)
     
-        wall = Wall(0, 0, 10, 600)
-        self.walls.add(wall)
-        self.gameobjects.add(wall)
-
-        wall = Wall(10, 0, 790, 10)
-        self.walls.add(wall)
-        self.gameobjects.add(wall)
-
-        wall = Wall(10, 200, 100, 10)
-        self.walls.add(wall)
-        self.gameobjects.add(wall)
+        self._add_enemy(50, 100)
+        self._add_enemy(100, 100) 
 
         self.player = Player(50, 50)
         self.player.walls = self.walls
+        self.player.enemies = self.enemies
         self.gameobjects.add(self.player)
         
-        self.enemy = Enemy(50, 100)
-        self.enemy.walls = self.walls
-        self.gameobjects.add(self.enemy)
-        
-
     def run(self):
         self.clock = pygame.time.Clock()
         self.running = True
 
         while self.running:
-            self._handle_input()           
+            self._handle_input()
+                 
+            self.player.update()      
             self.gameobjects.update()
             
-            self.screen.fill(Style.BLACK)        
+            self.screen.fill(Style.BLACK)     
+
             self.gameobjects.draw(self.screen)
             
             pygame.display.flip()
@@ -52,7 +47,18 @@ class Game:
             self.clock.tick(60)
 
         pygame.quit()
-    
+
+    def _add_enemy(self, x, y): 
+        enemy = Enemy(x, y)
+        enemy.walls = self.walls
+        self.gameobjects.add(enemy)
+        self.enemies.add(enemy)
+
+    def _add_wall(self, x, y, width, height):
+        wall = Wall(x, y, width, height)
+        self.walls.add(wall)
+        self.gameobjects.add(wall) 
+        
     def _handle_input(self):
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -76,7 +82,8 @@ class Game:
                         self.player.move(0, self.player.speed)
                     elif event.key == pygame.K_s:
                         self.player.move(0, -self.player.speed)
-                        
+    
+    
 Game().run()               
             
             
