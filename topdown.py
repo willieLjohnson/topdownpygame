@@ -8,7 +8,7 @@ Vector = pygame.Vector2
 class Game:
     def __init__(self):
         pygame.init()
-        pygame.display.set_caption('Platformer')
+        pygame.display.set_caption('topdownpygame')
         
         self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
