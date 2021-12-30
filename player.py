@@ -19,7 +19,7 @@ class Player(pygame.sprite.Sprite):
         self.walls = None
 
 
-    def change_speed(self, x, y):
+    def move(self, x, y):
         self.velocity.x += x
         self.velocity.y += y
 
