@@ -33,13 +33,26 @@ class Game:
         
 
     def run(self):
-        clock = pygame.time.Clock()
-        running = True
+        self.clock = pygame.time.Clock()
+        self.running = True
 
-        while running:
-            for event in pygame.event.get():
+        while self.running:
+            self._handle_input()           
+            self.gameobjects.update()
+            
+            self.screen.fill(Style.BLACK)        
+            self.gameobjects.draw(self.screen)
+            
+            pygame.display.flip()
+            
+            self.clock.tick(60)
+
+        pygame.quit()
+    
+    def _handle_input(self):
+        for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_a:
                         self.player.move(-self.player.speed, 0)
@@ -60,15 +73,6 @@ class Game:
                     elif event.key == pygame.K_s:
                         self.player.move(0, -self.player.speed)
                         
-            self.gameobjects.update()
-            
-            self.screen.fill(Style.BLACK)        
-            self.gameobjects.draw(self.screen)
-            pygame.display.flip()
-            clock.tick(60)
-
-        pygame.quit()
-                
 Game().run()               
             
             
