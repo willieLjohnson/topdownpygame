@@ -28,22 +28,9 @@ class Player(pygame.sprite.Sprite):
         self._handle_gameobject_collision()
 
     def _handle_enemy_collision(self):
-        enemies_hit = pygame.sprite.spritecollide(self, self.enemies, False)
+        enemies_hit = pygame.sprite.spritecollide(self, self.game.enemies, False)
         
-        for enemy in enemies_hit:
-            if self.velocity.x > 0:
-                self.rect.right = enemy.rect.left
-            else:
-                self.rect.left = enemy.rect.right
-
-        self.rect.y += self.velocity.y
-    
-        enemies_hit = pygame.sprite.spritecollide(self, self.enemies, False)
-        for enemy in enemies_hit:
-            if self.velocity.y > 0:
-                self.rect.bottom = enemy.rect.top
-            else:
-                self.rect.top = enemy.rect.bottom 
+        # TODO: handle damages and what not
                 
     def _handle_gameobject_collision(self):
         gameobjects_collided = pygame.sprite.spritecollide(self, self.game.get_gameobjects(), False)
