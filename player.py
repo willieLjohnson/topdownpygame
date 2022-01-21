@@ -25,12 +25,16 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.x += self.velocity.x
+        self.rect.y += self.velocity.y
+        self._handle_enemy_collision()
         self._handle_gameobject_collision()
 
     def _handle_enemy_collision(self):
         enemies_hit = pygame.sprite.spritecollide(self, self.game.enemies, False)
-        
-        # TODO: handle damages and what not
+
+        for enemy in enemies_hit:
+            print(enemy)
+            enemy.receiveDamage(10)
                 
     def _handle_gameobject_collision(self):
         gameobjects_collided = pygame.sprite.spritecollide(self, self.game.get_gameobjects(), False)
@@ -40,8 +44,6 @@ class Player(pygame.sprite.Sprite):
                 self.rect.right = gameobject.rect.left
             else:
                 self.rect.left = gameobject.rect.right
-
-        self.rect.y += self.velocity.y
     
         gameobjects_collided = pygame.sprite.spritecollide(self, self.game.get_gameobjects(), False)
         for gameobject in gameobjects_collided:

@@ -1,59 +1,67 @@
 import pygame
 from config import *
 from player import Player
-from game_objects import Wall, Enemy
+from camera import *
+from game_objects import *
 
 Vector = pygame.Vector2
+
+screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+canvas = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 class Game:
     def __init__(self):
         pygame.init()
         pygame.display.set_caption('topdownpygame')
-        
-        self.screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
         self.gameobjects = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         
-        self._add_wall(0, 0, 10, 600)
-        self._add_wall(10, 0, 790, 10)
-        self._add_wall(10, 200, 100, 10)
+        self._add_wall(Vector(0, 0), Vector(10, 600))
+        self._add_wall(Vector(10, 0), Vector(790, 10))
+        self._add_wall(Vector(10, 200), Vector(100, 10))
     
-        self._add_enemy(50, 100)
-        self._add_enemy(100, 100) 
+        self._add_enemy(Vector(50, 100))
+        self._add_enemy(Vector(100, 100))
 
         self.player = Player(self, 50, 50)
         self.player.enemies = self.enemies
-        self.gameobjects.add(self.player)
+        
+        self.camera = Camera(self.player)
+        follow = Follow(self.camera, self.player)
+        self.camera.setmethod(follow)
         
     def run(self):
         self.clock = pygame.time.Clock()
         self.running = True
 
         while self.running:
-            self._handle_input()
-                 
-            self.gameobjects.update()
-            
-            self.screen.fill(Style.BLACK)     
-
-            self.gameobjects.draw(self.screen)
-            
-            pygame.display.flip()
-            
             self.clock.tick(60)
+            self._handle_input()
+            self.gameobjects.update()
+            self.player.update()
+            self.camera.scroll()
+            canvas.fill(Style.BLACK)
+            
+            for gameobject in self.gameobjects:
+                canvas.blit(gameobject.image, (gameobject.rect.x - self.camera.offset.x, gameobject.rect.y - self.camera.offset.y))
+            canvas.blit(self.player.image, (self.player.rect.x - self.camera.offset.x, self.player.rect.y - self.camera.offset.y))
+            screen.blit(canvas, (0, 0))
+            
+            pygame.display.update()
+            
 
         pygame.quit()
 
-    def _add_enemy(self, x, y): 
-        enemy = Enemy(x, y)
+    def _add_enemy(self, position): 
+        enemy = Enemy(self, position)
         enemy.walls = self.walls
         self.gameobjects.add(enemy)
         self.enemies.add(enemy)
 
-    def _add_wall(self, x, y, width, height):
-        wall = Wall(x, y, width, height)
+    def _add_wall(self, position, size):
+        wall = Wall(self, position, size)
         self.walls.add(wall)
         self.gameobjects.add(wall) 
         
