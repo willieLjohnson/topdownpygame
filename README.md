@@ -45,14 +45,18 @@
 
 ### v0.1.0 - Managers
 
-- [ ] Managers
-  - [ ] Scene
-  - [ ] Entity
-  - [ ] Actors
-  - [ ] Sound
-  - [ ] Save
+- [ ] Scene
+- [ ] Entity
+- [ ] Actors
+- [ ] Sound
+- [ ] Save
 
 ### v0.2.0 - Procedural generation
+
+- [ ] ECS
+- [ ] Map
+- [ ] Art
+- [ ] Sound
 
 ### v0.3.0 - VFX
 
@@ -62,6 +66,15 @@
 - [ ] Shaders
 
 ### v0.x.0 - TBD...
+
+- [ ] Menus with easy navigation
+- [ ] Prefabs to allow for easily creating entire scenes/objects
+- [ ] Spritesheet and atlas for animations
+- [ ] Sharing and saving seeds
+- [ ] Map building through external tools/files
+- [ ] Parallax scrolling
+- [ ] Build for Web, Mobile, PC, and Mac
+- [ ] Commandline tools
 
 ### v1.0.0 - Release
 
