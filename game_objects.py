@@ -4,6 +4,7 @@ import pygame
 from config import Style, Color
 from dataclasses import dataclass
 from core import *
+import uuid
 
 Vector = pygame.Vector2
 Group = pygame.sprite.Group
@@ -19,6 +20,7 @@ class Direction:
     RIGHT: float = 1.0
 
 class ComponentType(Enum):
+    ID = "ID"
     DEFAULT = "DEFAULT"
     STATS = "STATS"
     BODY = "BODY"
@@ -26,6 +28,11 @@ class ComponentType(Enum):
 @dataclass
 class Component:
     type = ComponentType.DEFAULT
+    
+@dataclass
+class ID(Component):
+    type = ComponentType.ID
+    uuid: uuid.UUID
     
 @dataclass
 class Stats(Component):
@@ -66,16 +73,12 @@ class Body(Component):
         self.h_collision = False
         self.v_collision = False
 
-# Game Object
-class GameObject(pygame.sprite.Sprite):
-    def __init__(self, game, name, position, size, color, speed):
+# Entities
+class Entity(pygame.sprite.Sprite):
+    def __init__(self, name):
         super().__init__()
-        self.game = game
         self.name = name
-        self.components = {
-            ComponentType.BODY: Body(position, size, color, speed)
-        }
-        self._updatesprite()
+        self.components = {ComponentType.ID: uuid.uuid1()}
         
     def set_component(self, component_type, component):
         self.components[component_type] = component
@@ -131,19 +134,30 @@ class GameObject(pygame.sprite.Sprite):
     def _reset_collisions(self):
         self.get_component(ComponentType.BODY).reset_collisions()
         
+
+## Game Objects
+
+class GameObject(Entity):
+    def __init__(self, game, name, position, size, color, speed):
+        super().__init__(name)
+        self.game = game
+        self.name = name
+        self.set_component(ComponentType.BODY, Body(position, size, color, speed))
+        self._updatesprite()
+    
 class Wall(GameObject):
     def __init__(self, game, position, size):
         super().__init__(game, WALL, position, size, Style.BROWN, 0)
     
-## Entities 
-class Entity(GameObject):
+## Actors
+
+class Actor(GameObject):
     def __init__(self, game, name, position, size, color, speed, health, strength, defense, agility):
         super().__init__(game, name, position, size, color, speed)
         self.set_component(ComponentType.STATS, Stats(health, strength, defense, agility))
         
     def update(self):
         super().update()
-        
         
     def _hurt(self, amount):
         self.stats.health -= amount
@@ -159,8 +173,7 @@ class Entity(GameObject):
         # TODO: Timer that has shows damage animation effect
        
 
-
-class Enemy(Entity):
+class Enemy(Actor):
     def __init__(self, game, position, size):
         super().__init__(game, ENEMY, position, size, Style.RED, 3, 100, 1, 1, 1)
         

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from core import *
+from core import Color
 
 @dataclass
 class Style():

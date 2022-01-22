@@ -2,6 +2,7 @@ import pygame
 vec = pygame.math.Vector2
 from abc import ABC, abstractmethod
 from config import *
+from core import *
 
 class Camera:
     def __init__(self, player):

@@ -11,10 +11,10 @@ screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 canvas = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 @dataclass
-class Color():
-    r: int
-    g: int
-    b: int
+class Color:
+    r: int = 255
+    g: int = 255
+    b: int = 255
     
     def rgb(self):
         return (self.r, self.g, self.b)
