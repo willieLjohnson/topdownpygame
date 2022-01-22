@@ -1,18 +1,7 @@
 from dataclasses import dataclass
-
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+from core import *
 
 @dataclass
-class Color():
-    r: int
-    g: int
-    b: int
-    
-    def rgb(self):
-        return (self.r, self.g, self.b)
-    
-@dataclass      
 class Style():
     BLACK: Color = (0, 0, 0)
     WHITE: Color = (225, 255, 255)
