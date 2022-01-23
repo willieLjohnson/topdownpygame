@@ -9,7 +9,7 @@ class Player(Entity):
     def __init__(self, game, x, y):
         super().__init__(PLAYER)
         self.game = game
-        self.set_component(ComponentType.BODY, Body(Vector(x,y), Vector(10,10), Style.WHITE, 3))
+        self.set_component(ComponentType.BODY, Body(Vector(x, y), Vector(10,10), Style.WHITE, Vector(0,0), 3))
         self._updatesprite()
     
     def update(self):

@@ -62,12 +62,20 @@ class Body(Component):
     position: Vector
     size: Vector
     color: Color
+    velocity: Vector
     speed: float
-    velocity: Vector = Vector(0, 0)
     h_collision: bool = False
     v_collision: bool = False
     
     is_alive: bool = True
+    
+    def __init__(self, position = None, size = None, color = None, velocity = None, speed = None):
+        super().__init__()
+        self.position = position if position else Vector(0, 0)
+        self.size = size if size else Vector(0, 0)
+        self.color = color if color else Style.STONE
+        self.velocity = velocity if velocity else Vector(0, 0)
+        self.speed = speed if speed else 3
        
     def reset_collisions(self):
         self.h_collision = False
@@ -142,7 +150,7 @@ class GameObject(Entity):
         super().__init__(name)
         self.game = game
         self.name = name
-        self.set_component(ComponentType.BODY, Body(position, size, color, speed))
+        self.set_component(ComponentType.BODY, Body(position, size, color, speed=speed))
         self._updatesprite()
     
 class Wall(GameObject):
@@ -190,48 +198,42 @@ class Enemy(Actor):
         
 def collide(gameobject, other):
     if gameobject.rect.colliderect(other.rect):
-        collision_tolerance_h = 10
-        collision_tolerance_w = 10
+        collision_tolerance_h = gameobject.rect.h * 0.8
+        collision_tolerance_w = gameobject.rect.w * 0.8
         
         gameobject_body = gameobject.get_component(ComponentType.BODY)
         other_body = other.get_component(ComponentType.BODY)
         
-        if not gameobject_body.h_collision:
-            # moving up
-            up_difference = other.rect.bottom - gameobject.rect.top
-            if abs(up_difference) < collision_tolerance_h and gameobject_body.velocity.y < 0:
-                other_body.velocity.y = gameobject_body.velocity.y
-                gameobject_body.velocity.y *= -1
-                gameobject.rect.y += up_difference
-                other.rect.y -= up_difference
-                gameobject_body.v_collision = True
+        # moving up
+        up_difference = other.rect.bottom - gameobject.rect.top
+        if abs(up_difference) < collision_tolerance_h and gameobject_body.velocity.y < 0:
+            other_body.velocity.y = gameobject_body.velocity.y * 0.5
+            gameobject_body.velocity.y *= -1
+            gameobject.rect.y += up_difference
+            gameobject_body.v_collision = True
 
-                
-            # moving down
-            down_difference = other.rect.top - gameobject.rect.bottom
-            if abs(down_difference) < collision_tolerance_h and gameobject_body.velocity.y > 0:
-                other_body.velocity.y = gameobject_body.velocity.y
-                gameobject_body.velocity.y *= -1
-                gameobject.rect.y += down_difference
-                other.rect.y -= down_difference
-                gameobject_body.v_collision = True
+            
+        # moving down
+        down_difference = other.rect.top - gameobject.rect.bottom
+        if abs(down_difference) < collision_tolerance_h and gameobject_body.velocity.y > 0:
+            other_body.velocity.y = gameobject_body.velocity.y * 0.5
+            gameobject_body.velocity.y *= -1
+            gameobject.rect.y += down_difference
+            gameobject_body.v_collision = True
 
         # moving left
-        if not gameobject_body.v_collision:
-            left_difference = other.rect.right - gameobject.rect.left
-            if abs(left_difference) < collision_tolerance_w and gameobject_body.velocity.x < 0:
-                other_body.velocity.x = gameobject_body.velocity.x
+        left_difference = other.rect.right - gameobject.rect.left
+        if abs(left_difference) < collision_tolerance_w and gameobject_body.velocity.x < 0:
+            other_body.velocity.x = gameobject_body.velocity.x * 0.5
 
-                gameobject_body.velocity.x *= -1
-                gameobject.rect.x += left_difference
-                gameobject_body.h_collision = True
-                other.rect.x -= left_difference
+            gameobject_body.velocity.x *= -1
+            gameobject.rect.x += left_difference
+            gameobject_body.h_collision = True
 
-            # moving right
-            right_difference = other.rect.left - gameobject.rect.right
-            if abs(right_difference) < collision_tolerance_w and gameobject_body.velocity.x > 0:
-                other_body.velocity.x = gameobject_body.velocity.x
-                gameobject_body.velocity.x *= -1
-                gameobject.rect.x += right_difference
-                gameobject_body.h_collision = True
-                other.rect.x -= right_difference
+        # moving right
+        right_difference = other.rect.left - gameobject.rect.right
+        if abs(right_difference) < collision_tolerance_w and gameobject_body.velocity.x > 0:
+            other_body.velocity.x = gameobject_body.velocity.x * 0.5
+            gameobject_body.velocity.x *= -1
+            gameobject.rect.x += right_difference
+            gameobject_body.h_collision = True

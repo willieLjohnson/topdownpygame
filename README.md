@@ -25,6 +25,7 @@
 
 ## Roadmap
 
+
 ### spec - ECS, Collision, Physics
 
 - [x] Game and loop
@@ -42,9 +43,9 @@
   - [x] Collision
   - [ ] Physics
 
-
 ### v0.1.0 - Managers
 
+- [ ] Systems
 - [ ] Scene
 - [ ] Entity
 - [ ] Actors
