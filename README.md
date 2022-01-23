@@ -1,6 +1,16 @@
-# prototype: topdownpygame
+# core: topdownpygame
 
-2d topdown prototype created in pygame
+The core mechanics of a topdown 2d game created with pygame.
+
+## Goal
+
+- [ ] Easy to use ECS.
+- [ ] Importable into any project 'import topdowncore'
+- [ ] Main functionality from a single import.
+- [ ] Visual FX of near production quality 2d indie game with a debug mode that shows the underlying progammer art.
+- [ ] Ingame debug commands through simple ui textfield.
+- [ ] Procedural generation.
+- [ ] Fully featured demo.
 
 ## Features
 
@@ -76,11 +86,6 @@
 - [ ] Parallax scrolling
 - [ ] Build for Web, Mobile, PC, and Mac
 - [ ] Commandline tools
-
-### v1.0.0 - Release
-
-- [ ] Easy to use ECS.
-- [ ] Code can easily be reused in other projects.
-- [ ] Visual FX of near production quality 2d indie game.
-- [ ] Fully featured vertical slice game.
-- [ ] Procedural generation
+- [ ] Item pickups and inventory system
+- [ ] Customizable weapons
+- [ ] Achievments

@@ -1,15 +1,22 @@
 import pygame
-vec = pygame.math.Vector2
 from abc import ABC, abstractmethod
-from config import *
-from core import *
+
+from . import world
+
+Vec2 = world.Vec2
+
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+
+screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+canvas = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 class Camera:
     def __init__(self, player):
         self.player = player
-        self.offset = vec(0, 0)
-        self.offset_float = vec(0, 0)
-        self.CONST = vec(-SCREEN_WIDTH / 2 + player.rect.w / 2, -SCREEN_HEIGHT / 2 + player.rect.h / 2)
+        self.offset = Vec2(0, 0)
+        self.offset_float = Vec2(0, 0)
+        self.CONST = Vec2(-SCREEN_WIDTH / 2 + player.rect.w / 2, -SCREEN_HEIGHT / 2 + player.rect.h / 2)
 
     def setmethod(self, method):
         self.method = method

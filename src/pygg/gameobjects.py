@@ -1,17 +1,26 @@
-from enum import Enum
-from typing import Any
 import pygame
-from config import Style, Color
-from dataclasses import dataclass
-from core import *
 import uuid
+from enum import Enum
+from dataclasses import dataclass
 
-Vector = pygame.Vector2
-Group = pygame.sprite.Group
+from . import world
+from . import style
 
-PLAYER = "Player"
-ENEMY = "Enemy"
-WALL = "Wall"
+
+World = world.World
+Vec2 = world.Vec2
+Color = style.Color
+STYLE = style.STYLE
+
+
+PLAYER_NAME = "Player"
+ENEMY_NAME = "Enemy"
+WALL_NAME = "Wall"
+
+PLAYER_COLOR = STYLE.WHITE
+ENEMY_COLOR = STYLE.RED
+WALL_COLOR = STYLE.BROWN
+DEATH_COLOR = STYLE.RED_FADED
 
 class Direction:
     UP: float = -1.0
@@ -59,10 +68,10 @@ class Stats(Component):
 class Body(Component):
     type = ComponentType.BODY
     
-    position: Vector
-    size: Vector
+    position: Vec2
+    size: Vec2
     color: Color
-    velocity: Vector
+    velocity: Vec2
     speed: float
     mass: float
     density: float = 1.0
@@ -73,10 +82,10 @@ class Body(Component):
     
     def __init__(self, position = None, size = None, color = None, velocity = None, speed = None):
         super().__init__()
-        self.position = position if position else Vector(0, 0)
-        self.size = size if size else Vector(0, 0)
-        self.color = color if color else Style.STONE
-        self.velocity = velocity if velocity else Vector(0, 0)
+        self.position = position if position else Vec2(0, 0)
+        self.size = size if size else Vec2(0, 0)
+        self.color = color if color else STYLE.STONE
+        self.velocity = velocity if velocity else Vec2(0, 0)
         self.speed = speed if speed else 3
         self.calculate_mass()
         
@@ -85,7 +94,7 @@ class Body(Component):
         self.v_collision = False
         
     def calculate_mass(self):
-        self.mass = (self.size.x * self.size.y) * self.density
+        self.mass = (self.size.x * self.size.y) * self.density * World.FRICTION
         
     def get_momentum(self):
         return self.mass * self.velocity
@@ -128,8 +137,7 @@ class Entity(pygame.sprite.Sprite):
     
     def _reset_velocity(self):
         body = self.get_component(ComponentType.BODY)
-        body.velocity = Vector(0, 0)
-    
+        body.velocity = Vec2(0,0)  
     def _move(self):
         body = self.get_component(ComponentType.BODY)
         self.rect.y += body.velocity.y
@@ -144,7 +152,7 @@ class Entity(pygame.sprite.Sprite):
         self.rect.y = body.position.y
        
     def _handle_gameobject_collision(self):
-        gameobjects = self.game.get_gameobjects()
+        gameobjects = self.game.gameobjects
         for gameobject in gameobjects:
             if gameobject == self:
                 continue
@@ -167,7 +175,7 @@ class GameObject(Entity):
     
 class Wall(GameObject):
     def __init__(self, game, position, size):
-        super().__init__(game, WALL, position, size, Style.BROWN, 0)
+        super().__init__(game, WALL_NAME, position, size, WALL_COLOR, 0)
     
 ## Actors
 
@@ -186,7 +194,7 @@ class Actor(GameObject):
             self._die()
             
     def _die(self):
-        self.change_color(Style.BLACK)
+        self.change_color(DEATH_COLOR)
         self.get_component(ComponentType.BODY).die()
         
     def receiveDamage(self, amount):
@@ -196,7 +204,7 @@ class Actor(GameObject):
 
 class Enemy(Actor):
     def __init__(self, game, position, size):
-        super().__init__(game, ENEMY, position, size, Style.RED, 3, 100, 1, 1, 1)
+        super().__init__(game, ENEMY_NAME, position, size, ENEMY_COLOR, 3, 100, 1, 1, 1)
         
     def update(self):
         super().update()
@@ -205,7 +213,7 @@ class Enemy(Actor):
         targets_hit = pygame.sprite.spritecollide(self, targets, False)
         
         for target in targets_hit:
-            if target.name == PLAYER:
+            if target.name == PLAYER_NAME:
                 # TODO: Player damage
                 pass
 

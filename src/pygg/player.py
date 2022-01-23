@@ -1,15 +1,22 @@
-from turtle import down
 import pygame
-from config import Style
-from game_objects import *
 
-Vector = pygame.Vector2
+from . import gameobjects
+from . import world
+
+Entity = gameobjects.Entity
+playerName = gameobjects.PLAYER_NAME
+playerColor = gameobjects.PLAYER_COLOR
+ComponentType = gameobjects.ComponentType
+Body = gameobjects.Body
+
+
+Vec2 = world.Vec2
 
 class Player(Entity):
     def __init__(self, game, x, y):
-        super().__init__(PLAYER)
+        super().__init__(playerName)
         self.game = game
-        self.set_component(ComponentType.BODY, Body(Vector(x, y), Vector(10,10), Style.WHITE, Vector(0,0), 3))
+        self.set_component(ComponentType.BODY, Body(Vec2(x, y), Vec2(15,15), playerColor, Vec2(0,0), 3))
         self._updatesprite()
     
     def update(self):

@@ -1,11 +1,6 @@
 import pygame
-from config import *
-from player import Player
-from camera import *
-from game_objects import *
-from core import *
-from random import *
-
+import random
+from . import pygg as GG
            
 def collide(gameobject, other):
     if gameobject.rect.colliderect(other.rect):
@@ -44,11 +39,11 @@ def collide(gameobject, other):
             gameobject.rect.x += right_difference
             # other.rect.x -= right_difference
             
-class Bouncy(Game):
+class BouncyGame(GG.Game):
     def __init__(self):
         super().__init__('bouncy')
         for i in range(50):
-            self._create_bouncy(Vector((SCREEN_WIDTH - 15) * random(), (SCREEN_HEIGHT - 15) * random()))
+            self._create_bouncy(GG.Vec2((GG.SCREEN_WIDTH - 15) * random(), (GG.SCREEN_HEIGHT - 15) * random()))
         
 
 
@@ -62,23 +57,23 @@ class Bouncy(Game):
             self.gameobjects.update()
             self._handle_collisions()
             self._handle_input()
-            screen.fill(Style.BLACK)
-            self.gameobjects.draw(screen)
+            GG.screen.fill(GG.Style.BLACK)
+            self.gameobjects.draw(GG.screen)
             pygame.display.update()
 
         pygame.quit()
     
-    def _create_bouncy(self, position=Vector((SCREEN_WIDTH - 15) * random(), (SCREEN_HEIGHT - 15) * random())):
-        bouncy = Entity(self, 'bouncy', Body(position=position, color= (255 * random(), 255* random(), 255* random())))
-        bouncy.body.velocity = Vector(1,1)
+    def _create_bouncy(self, position=GG.Vec2((GG.SCREEN_WIDTH - 15) * random(), (GG.SCREEN_HEIGHT - 15) * random())):
+        bouncy = GG.Entity(self, 'bouncy', GG.Body(position=position, color= (255 * random(), 255* random(), 255* random())))
+        bouncy.body.velocity = GG.Vec2(1,1)
         self.gameobjects.add(bouncy)
       
     def _handle_collisions(self):        
         for bouncy in self.gameobjects:
             # with screen
-            if bouncy.rect.right > SCREEN_WIDTH or bouncy.rect.left < 0:
+            if bouncy.rect.right > GG.SCREEN_WIDTH or bouncy.rect.left < 0:
                 bouncy.body.velocity.x *= -1
-            if bouncy.rect.bottom > SCREEN_HEIGHT or bouncy.rect.top < 0:
+            if bouncy.rect.bottom > GG.SCREEN_HEIGHT or bouncy.rect.top < 0:
                 bouncy.body.velocity.y *= -1
                 
             for other in self.gameobjects:
@@ -108,4 +103,3 @@ class Bouncy(Game):
     def get_gameobjects(self):
         return [*self.walls, *self.enemies]
     
-Bouncy().run()               
