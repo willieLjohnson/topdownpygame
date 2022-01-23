@@ -1,1 +1,1 @@
-from . import topdowngame
+from .topdowngame import *

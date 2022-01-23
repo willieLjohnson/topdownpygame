@@ -1,4 +1,5 @@
 import pygame
+
 from . import pygg as GG
 
 class TopDownGame(GG.Game):
@@ -14,7 +15,7 @@ class TopDownGame(GG.Game):
         self._add_enemy(GG.Vec2(100, 100))
         
         for i in range(2): 
-            self.gameobjects.add(GG.GameObject(self, 'block', GG.Vec2(i * 30, i * 30), GG.Vec2(15,15), GG.STYLE.BLUE, 0))
+            self.gameobjects.add(GG.GameObject(self, "block", GG.gen_vec2(100, 100, 10, 10), GG.Vec2(15,15), self.style.NAVY, 0))
 
         self.player = GG.Player(self, 50, 50)
         self.player.enemies = self.enemies
@@ -29,6 +30,7 @@ class TopDownGame(GG.Game):
 
         while self.running:
             self.clock.tick(60)
+            self._handle_quit()
             self._handle_input()
             self.gameobjects.update()
             self.player.update()
@@ -41,7 +43,7 @@ class TopDownGame(GG.Game):
                 else:
                     self.gameobjects.remove(gameobject)
             GG.canvas.blit(self.player.image, (self.player.rect.x - self.camera.offset.x, self.player.rect.y - self.camera.offset.y))
-            GG.screen.blit(GG.canvas, (0, 0))
+            GG.main.blit(GG.canvas, (0, 0))
             
             pygame.display.update()
         
@@ -57,10 +59,6 @@ class TopDownGame(GG.Game):
         self.gameobjects.add(wall)
         
     def _handle_input(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
-        
         keys = pygame.key.get_pressed()  #checking pressed keys
 
         if keys[pygame.K_a]:

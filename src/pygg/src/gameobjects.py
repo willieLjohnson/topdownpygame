@@ -10,7 +10,7 @@ from . import style
 World = world.World
 Vec2 = world.Vec2
 Color = style.Color
-STYLE = style.STYLE
+STYLE = style.GGSTYLE
 
 
 PLAYER_NAME = "Player"
@@ -20,7 +20,7 @@ WALL_NAME = "Wall"
 PLAYER_COLOR = STYLE.WHITE
 ENEMY_COLOR = STYLE.RED
 WALL_COLOR = STYLE.BROWN
-DEATH_COLOR = STYLE.RED_FADED
+DEATH_COLOR = STYLE.BLACK
 
 class Direction:
     UP: float = -1.0
@@ -71,16 +71,17 @@ class Body(Component):
     position: Vec2
     size: Vec2
     color: Color
-    velocity: Vec2
     speed: float
+    velocity: Vec2
     mass: float
     density: float = 1.0
     h_collision: bool = False
     v_collision: bool = False
     
     is_alive: bool = True
+    is_frictionless: bool = False
     
-    def __init__(self, position = None, size = None, color = None, velocity = None, speed = None):
+    def __init__(self, position = None, size = None, color = None, speed = None, velocity = None):
         super().__init__()
         self.position = position if position else Vec2(0, 0)
         self.size = size if size else Vec2(0, 0)
@@ -136,8 +137,9 @@ class Entity(pygame.sprite.Sprite):
         self.image.fill(new_color)
     
     def _reset_velocity(self):
-        body = self.get_component(ComponentType.BODY)
-        body.velocity = Vec2(0,0)  
+        body = self.get_component(ComponentType.BODY)        
+        body.velocity = body.velocity if body.is_frictionless else Vec2(0, 0)
+        
     def _move(self):
         body = self.get_component(ComponentType.BODY)
         self.rect.y += body.velocity.y
@@ -166,11 +168,11 @@ class Entity(pygame.sprite.Sprite):
 ## Game Objects
 
 class GameObject(Entity):
-    def __init__(self, game, name, position, size, color, speed):
+    def __init__(self, game, name, position, size, color, speed, velocity=None):
         super().__init__(name)
         self.game = game
         self.name = name
-        self.set_component(ComponentType.BODY, Body(position, size, color, speed=speed))
+        self.set_component(ComponentType.BODY, Body(position, size, color, speed, velocity))
         self._updatesprite()
     
 class Wall(GameObject):
