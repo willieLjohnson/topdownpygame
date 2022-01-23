@@ -64,6 +64,8 @@ class Body(Component):
     color: Color
     velocity: Vector
     speed: float
+    mass: float
+    density: float = 1.0
     h_collision: bool = False
     v_collision: bool = False
     
@@ -76,11 +78,21 @@ class Body(Component):
         self.color = color if color else Style.STONE
         self.velocity = velocity if velocity else Vector(0, 0)
         self.speed = speed if speed else 3
-       
+        self.calculate_mass()
+        
     def reset_collisions(self):
         self.h_collision = False
         self.v_collision = False
-
+        
+    def calculate_mass(self):
+        self.mass = (self.size.x * self.size.y) * self.density
+        
+    def get_momentum(self):
+        return self.mass * self.velocity
+    
+    def die(self):
+        self.is_alive = False
+        
 # Entities
 class Entity(pygame.sprite.Sprite):
     def __init__(self, name):
@@ -168,13 +180,14 @@ class Actor(GameObject):
         super().update()
         
     def _hurt(self, amount):
-        self.stats.health -= amount
-        if (self.stats.health < 0):
+        stats = self.get_component(ComponentType.STATS)
+        stats.health -= amount
+        if (stats.health < 0):
             self._die()
             
     def _die(self):
         self.change_color(Style.BLACK)
-        self.is_alive = False
+        self.get_component(ComponentType.BODY).die()
         
     def receiveDamage(self, amount):
         self._hurt(amount)
@@ -195,7 +208,10 @@ class Enemy(Actor):
             if target.name == PLAYER:
                 # TODO: Player damage
                 pass
-        
+
+# (m1 • v1) + (m2 • v2) = (m1 • v1') + (m2 • v2')
+# (momentum1) + (momentum2) = ()
+
 def collide(gameobject, other):
     if gameobject.rect.colliderect(other.rect):
         collision_tolerance_h = gameobject.rect.h * 0.8
@@ -204,11 +220,12 @@ def collide(gameobject, other):
         gameobject_body = gameobject.get_component(ComponentType.BODY)
         other_body = other.get_component(ComponentType.BODY)
         
+        gameobject_momentum = gameobject_body.get_momentum()
+        other_momentum = other_body.get_momentum()
+        
         # moving up
         up_difference = other.rect.bottom - gameobject.rect.top
         if abs(up_difference) < collision_tolerance_h and gameobject_body.velocity.y < 0:
-            other_body.velocity.y = gameobject_body.velocity.y * 0.5
-            gameobject_body.velocity.y *= -1
             gameobject.rect.y += up_difference
             gameobject_body.v_collision = True
 
@@ -216,24 +233,20 @@ def collide(gameobject, other):
         # moving down
         down_difference = other.rect.top - gameobject.rect.bottom
         if abs(down_difference) < collision_tolerance_h and gameobject_body.velocity.y > 0:
-            other_body.velocity.y = gameobject_body.velocity.y * 0.5
-            gameobject_body.velocity.y *= -1
             gameobject.rect.y += down_difference
             gameobject_body.v_collision = True
 
         # moving left
         left_difference = other.rect.right - gameobject.rect.left
         if abs(left_difference) < collision_tolerance_w and gameobject_body.velocity.x < 0:
-            other_body.velocity.x = gameobject_body.velocity.x * 0.5
-
-            gameobject_body.velocity.x *= -1
             gameobject.rect.x += left_difference
             gameobject_body.h_collision = True
 
         # moving right
         right_difference = other.rect.left - gameobject.rect.right
         if abs(right_difference) < collision_tolerance_w and gameobject_body.velocity.x > 0:
-            other_body.velocity.x = gameobject_body.velocity.x * 0.5
-            gameobject_body.velocity.x *= -1
             gameobject.rect.x += right_difference
             gameobject_body.h_collision = True
+            
+        other_body.velocity = gameobject_momentum / other_body.mass
+        gameobject_body.velocity = other_momentum / gameobject_body.mass
