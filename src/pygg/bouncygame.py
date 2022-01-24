@@ -1,13 +1,14 @@
 import pygame
-from . import pygg as GG
+import src as GG
 
 class BouncyGame(GG.Game):
 
     def __init__(self):
         super().__init__('bouncy')
         self.speed_multiplier = 1
+        self.style.background = GG.GGSTYLE.BLACK
 
-        for _ in range(50):
+        for _ in range(100):
             self._create_bouncy()
     
         
@@ -18,6 +19,8 @@ class BouncyGame(GG.Game):
         while self.running:
             self._handle_quit()
             self._handle_input()
+            
+            GG.main.fill(self.style.background) 
             
             self.clock.tick(60)
             
@@ -31,11 +34,10 @@ class BouncyGame(GG.Game):
                     
             self.gameobjects.update()
             
-            GG.main.fill(GG.STYLE.BLACK)
-            
             self.gameobjects.draw(GG.main)
             
             pygame.display.update()
+
 
         pygame.quit()
     
@@ -58,3 +60,6 @@ class BouncyGame(GG.Game):
             self.speed_multiplier -= 0.001
         if keys[pygame.K_d]:
             self.speed_multiplier += 0.001
+
+
+BouncyGame().run()

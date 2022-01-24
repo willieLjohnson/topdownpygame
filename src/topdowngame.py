@@ -14,8 +14,8 @@ class TopDownGame(GG.Game):
         self._add_enemy(GG.Vec2(50, 100))
         self._add_enemy(GG.Vec2(100, 100))
         
-        for i in range(2): 
-            self.gameobjects.add(GG.GameObject(self, "block", GG.gen_vec2(100, 100, 10, 10), GG.Vec2(15,15), self.style.NAVY, 0))
+        for i in range(10): 
+            self.gameobjects.add(GG.GameObject(self, "block", GG.gen_vec2(100, 100, 10, 10), GG.Vec2(10,10), self.style.NAVY, 0))
 
         self.player = GG.Player(self, 50, 50)
         self.player.enemies = self.enemies
