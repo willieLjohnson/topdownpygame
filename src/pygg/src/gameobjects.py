@@ -227,12 +227,12 @@ class Enemy(Actor):
 
 def collide(gameobject, other):
     if gameobject.rect.colliderect(other.rect):
-        collision_tolerance_h = min(gameobject.rect.h, other.rect.h) * World.TOLERANCE
-        collision_tolerance_w = min(gameobject.rect.w, other.rect.w) * World.TOLERANCE
-        
         gameobject_body = gameobject.get_component(ComponentType.BODY)
         other_body = other.get_component(ComponentType.BODY)
         
+        collision_tolerance_h = min(gameobject_body.size.y, other_body.size.y) * World.TOLERANCE
+        collision_tolerance_w = min(gameobject_body.size.x, other_body.size.x) * World.TOLERANCE
+
         gameobject_momentum = gameobject_body.get_momentum()
         other_momentum = other_body.get_momentum()
         
@@ -244,8 +244,6 @@ def collide(gameobject, other):
                         
             other_body.velocity.y = gameobject_momentum.y / other_body.mass
             gameobject_body.velocity.y = other_momentum.y / gameobject_body.mass
-
-        
             
         # moving down
         down_difference = other.rect.top - gameobject.rect.bottom
@@ -268,7 +266,7 @@ def collide(gameobject, other):
         # moving right
         right_difference = other.rect.left - gameobject.rect.right
         if abs(right_difference) < collision_tolerance_w and gameobject_body.velocity.x > 0:
-            gameobject_body.position.y += right_difference
+            gameobject_body.position.x += right_difference
             gameobject_body.h_collision = True
                     
             other_body.velocity.x = gameobject_momentum.x / other_body.mass
