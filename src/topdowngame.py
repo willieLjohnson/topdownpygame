@@ -13,7 +13,8 @@ class TopDownGame(GG.Game):
     
         self._add_enemy(GG.Vec2(50, 100))
         self._add_enemy(GG.Vec2(100, 100))
-        
+        self.gameobjects.add(GG.GameObject(self, "block", GG.Vec2(200, 200), GG.Vec2(100,500), self.style.NAVY, 0))
+
         for i in range(10): 
             self.gameobjects.add(GG.GameObject(self, "block", GG.gen_vec2(100, 100, 10, 10), GG.Vec2(10,10), self.style.NAVY, 0))
 
@@ -38,7 +39,7 @@ class TopDownGame(GG.Game):
             GG.canvas.fill(GG.STYLE.BLACK)
             
             for gameobject in self.gameobjects:
-                if gameobject.is_alive():
+                if gameobject.is_alive:
                     GG.canvas.blit(gameobject.image, (gameobject.rect.x - self.camera.offset.x, gameobject.rect.y - self.camera.offset.y))
                 else:
                     self.gameobjects.remove(gameobject)
@@ -62,12 +63,12 @@ class TopDownGame(GG.Game):
         keys = pygame.key.get_pressed()  #checking pressed keys
 
         if keys[pygame.K_a]:
-            self.player.accelerate(GG.Direction.LEFT, 0)
+            self.player.accelerate(GG.Vec2(-1,0))
         if keys[pygame.K_d]:
-            self.player.accelerate(GG.Direction.RIGHT, 0)
+            self.player.accelerate(GG.Vec2(1,0))
         if keys[pygame.K_w]:
-            self.player.accelerate(0, GG.Direction.UP)
+            self.player.accelerate(GG.Vec2(0,-1))
         if keys[pygame.K_s]:
-            self.player.accelerate(0, GG.Direction.DOWN)
+            self.player.accelerate(GG.Vec2(0,1))
             
             
