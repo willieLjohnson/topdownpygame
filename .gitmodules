@@ -1,0 +1,3 @@
+[submodule "src/pygg"]
+	path = src/pygg
+	url = git@github.com:willieLjohnson/pygg.git
