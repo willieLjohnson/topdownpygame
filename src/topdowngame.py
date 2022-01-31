@@ -13,10 +13,11 @@ class TopDownGame(GG.Game):
     
         self._add_enemy(GG.Vec2(50, 100))
         self._add_enemy(GG.Vec2(100, 100))
-        self.gameobjects.add(GG.GameObject(self, "block", GG.Vec2(200, 200), GG.Vec2(100,500), self.style.NAVY, 0))
 
         for i in range(10): 
-            self.gameobjects.add(GG.GameObject(self, "block", GG.gen_vec2(100, 100, 10, 10), GG.Vec2(10,10), self.style.NAVY, 0))
+            self._add_block(GG.gen_vec2(100, 100, 10, 10), GG.Vec2(10, 10), GG.gen_color())
+
+        self._add_block(GG.gen_vec2(100, 100, 10, 10), GG.Vec2(100, 100), self.style.NAVY)
 
         self.player = GG.Player(self, 50, 50)
         self.player.enemies = self.enemies
@@ -24,6 +25,8 @@ class TopDownGame(GG.Game):
         self.camera = GG.Camera(self.player)
         follow = GG.Follow(self.camera, self.player)
         self.camera.setmethod(follow)
+        
+        self.space.damping = 0.01
         
     def run(self):
         self.clock = pygame.time.Clock()
@@ -33,6 +36,7 @@ class TopDownGame(GG.Game):
             self.clock.tick(60)
             self._handle_quit()
             self._handle_input()
+            self._update_space()
             self.gameobjects.update()
             self.player.update()
             self.camera.scroll()
@@ -58,6 +62,11 @@ class TopDownGame(GG.Game):
     def _add_wall(self, position, size):
         wall = GG.Wall(self, position, size)
         self.gameobjects.add(wall)
+        
+    def _add_block(self, position, size, color):
+        shape = GG.Rectangle(self.space, position, size, color)
+        block = GG.GameObject(self, "block", shape, 0)
+        self.gameobjects.add(block)
         
     def _handle_input(self):
         keys = pygame.key.get_pressed()  #checking pressed keys
