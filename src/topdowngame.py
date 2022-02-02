@@ -29,10 +29,9 @@ class TopDownGame(GG.Game):
         follow = GG.Follow(self.camera, self.player)
         self.camera.setmethod(follow)
         
-        self.space.damping = 0.01
+        self.space.damping = GG.World.DAMPING
         
     def run(self):
-        self.clock = pygame.time.Clock()
         self.running = 1
 
         while self.running == 1:
@@ -49,11 +48,10 @@ class TopDownGame(GG.Game):
                 gameobject_pos = gameobject.get_component(GG.ComponentType.BODY).form.body.position
                 distance = GG.Vec2(player_pos.x - gameobject_pos.x, player_pos.y - gameobject_pos.y).length()
                 if gameobject.is_alive:
-
                     if distance < 500:
                         gameobject_color = gameobject.get_component(GG.ComponentType.BODY).color
-                        gameobject.change_color((gameobject_color[0], gameobject_color[1], gameobject_color[2], 255 - (255 * distance / 500)))
-                        
+                        fog_alpha = (255 - (255 * distance / 500)) % 255
+                        gameobject.change_color((gameobject_color[0], gameobject_color[1], gameobject_color[2], fog_alpha))
                     if distance < 1000:
                         gameobject.update()
                     if distance < 500:
@@ -83,7 +81,7 @@ class TopDownGame(GG.Game):
         
     def _add_projectile(self, direction):
         position = self.player.get_component(GG.ComponentType.BODY).position + (direction * 20)
-        block = GG.Bullet(self, position, GG.Vec2(7, 7), direction)
+        block = GG.Bullet(self, position, GG.Vec2(8, 8), direction, self.player.weapon.bullet_speed)
         self.gameobjects.add(block) 
         
     def _handle_input(self):
@@ -100,9 +98,7 @@ class TopDownGame(GG.Game):
             self.player.accelerate(GG.Vec2(0,1))
             
         shoot_dir = GG.Vec2(0,0)
-        self.player.shoot_cooldown += self.clock.get_time()
-        if self.player.shoot_cooldown > 50:
-            self.player.shoot_cooldown = 0
+
             
             
         if keys[pygame.K_UP]:
@@ -114,7 +110,10 @@ class TopDownGame(GG.Game):
         if keys[pygame.K_RIGHT]:
             shoot_dir += GG.Vec2(1, 0)  
             
+        self.player.focusing = keys[pygame.K_LSHIFT]
+            
         
-        if (abs(shoot_dir.x) > 0 or abs(shoot_dir.y) > 0) and self.player.shoot_cooldown == 0:
+        if (abs(shoot_dir.x) > 0 or abs(shoot_dir.y) > 0) and self.player.can_shoot:
+            self.player.shoot()
             self._add_projectile(shoot_dir)
          
