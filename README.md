@@ -20,13 +20,13 @@ The core mechanics of a topdown 2d game created with pygame.
     - Acceleration and velocity.
 - Modularity through ECS and OOP:
     - Components and Objects:
-        - **Body** - the in game appreance of the gameobject.
-        - **Stats** - the stats of the gameobjectin game stats of the entity.
-        - **Entity** - a pygame sprites with ID component and a name:
+        - **Body** - the in game appreance of the entity.
+        - **Stats** - the stats of the entityin game stats of the entity.
+        - **Object** - a pygame sprites with ID component and a name:
           - **Player** - a player controlled entity with a body and stats component.
-          - **Gameobject** - an entity with a body component:
-            - **Walls** - a simple brown gameobject that doesn't move.
-            - **Actors** - gameobjects with with more functionality:
+          - **entity** - an entity with a body component:
+            - **Walls** - a simple brown entity that doesn't move.
+            - **Actors** - entities with with more functionality:
               - **Enemy** - an actor which attacks that player
     - Core classes:
         - **Game** - the main class that handles the game loop.
