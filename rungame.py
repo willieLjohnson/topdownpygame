@@ -1,6 +1,6 @@
-from src.topdown import TopDownGame
+from topdown.topdown import Game
 
 
 if __name__ == '__main__':
-    game = TopDownGame()
+    game = Game()
     game.run()

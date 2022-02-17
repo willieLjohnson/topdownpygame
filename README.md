@@ -16,10 +16,10 @@ The core mechanics of a topdown 2d game created with pygame.
 
 - Super simple.
 - Basic collision detection and physics:
-    - Pushing objects around.
+    - Pushing entities around.
     - Acceleration and velocity.
 - Modularity through ECS and OOP:
-    - Components and Objects:
+    - Components and entities:
         - **Body** - the in game appreance of the entity.
         - **Stats** - the stats of the entityin game stats of the entity.
         - **Object** - a pygame sprites with ID component and a name:
