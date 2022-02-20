@@ -32,7 +32,7 @@ class Game(gg.Game):
         while self.running:
             self._handle_quit()
             self._handle_input()
-            delta = self.clock.tick(60)
+            delta = self.clock.tick(120)
             self._update_space()
             self.entities.update()
             self.system.update(delta)
