@@ -190,17 +190,13 @@ class Game(gg.Game):
         pbody = self.player.get_body()
         pvelocity = pbody.velocity
         bullet_speed = self.player.get_weapon().bullet_speed
-   
-        same_x = (direction.x * pvelocity.x) > 0
-        same_y = (direction.y * pvelocity.y) > 0
-        
+
         velocity = gg.Vec2(direction.x * bullet_speed, direction.y * bullet_speed)
-        velocity += pvelocity
         velocity += gg.Vec2(velocity.x, 0)
         velocity += gg.Vec2(0, velocity.y)
 
         position = self.player.get_body().position + (direction * 10)
-        bullet = gg.Bullet(self, position, gg.Vec2(8, 8), velocity)
+        bullet = gg.Bullet(self, position, gg.Vec2(8, 8), pvelocity, velocity)
         self.entities[bullet.id] = bullet
         self.physics_system.add(bullet)
         self.decaying_system.add(bullet)
