@@ -23,20 +23,21 @@ class Game(gg.Game):
         self._add_wall(gg.Vec2(0, 0), gg.Vec2(10, 600))
         self._add_wall(gg.Vec2(10, 0), gg.Vec2(790, 10))
         self._add_wall(gg.Vec2(10, 200), gg.Vec2(100, 10))
-    
-        # self._add_enemy(gg.Vec2(50, 100))
+
+        self.player = gg.Player(self, 50, 50)
+        self.player.layers = entity_layer
+        self.player.enemies = self.enemies
+        self.physics_system.add(self.player)
+       
+        for i in range(5): 
+            self._add_enemy(gg.Vec2(50 + (i * 50), 100 + (i * 50)))
         # self._add_enemy(gg.Vec2(100, 100))
 
         # for i in range(10): 
         #     self._add_block(gg.gen_vec2(100, 100, 10, 10), gg.Vec2(10, 10), gg.gen_color())
 
         # self._add_block(gg.gen_vec2(100, 100, 10, 10), gg.Vec2(100, 100), self.style.NAVY)
-
-        self.player = gg.Player(self, 50, 50)
-        self.player.layers = entity_layer
-        self.player.enemies = self.enemies
-        self.physics_system.add(self.player)
-        
+ 
         self.screen.camera = gg.Camera(self.player, self.screen.width, self.screen.height)
         follow = gg.Follow(self.screen.camera, self.player)
         self.screen.camera.setmethod(follow)
@@ -78,8 +79,10 @@ class Game(gg.Game):
                     entity_color = entity.get_body().color
                     fog_alpha = (255 - (255 * distance / self.screen.width)) % 255
                     entity.change_color((entity_color[0], entity_color[1], entity_color[2], fog_alpha))
-                if distance < self.screen.width * 2:
+                if distance < 100_000:
                     entity.update()
+                
+                print(distance)
                 if distance < self.screen.width:
                     self.screen.draw(entity)
                 stats = entity.get_component(gg.Stats)
@@ -106,6 +109,7 @@ class Game(gg.Game):
             for id in self._finished_particle_fx:
                 del self.particle_effects[id]
             
+            print(len(self.entities))
 
             self.screen.draw(self.player)
 
@@ -170,9 +174,10 @@ class Game(gg.Game):
 
 
     def _add_enemy(self, position): 
-        enemy = gg.Enemy(self, position, gg.Vec2(15,15))
+        enemy = gg.Enemy(self, position, gg.Vec2(30,30))
         self.enemies.add(enemy)
-        self.entities.add(enemy)
+        self.entities[enemy.id] = enemy
+        self.physics_system.add(enemy)
 
     def _add_wall(self, position, size):
         wall = gg.Wall(self, position, size)
@@ -196,7 +201,7 @@ class Game(gg.Game):
         velocity += gg.Vec2(0, velocity.y)
 
         position = self.player.get_body().position + (direction * 10)
-        bullet = gg.Bullet(self, position, gg.Vec2(8, 8), pvelocity, velocity)
+        bullet = gg.Bullet(self, position, gg.Vec2(10, 8), pvelocity, velocity)
         self.entities[bullet.id] = bullet
         self.physics_system.add(bullet)
         self.decaying_system.add(bullet)
