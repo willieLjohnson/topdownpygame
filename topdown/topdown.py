@@ -29,7 +29,7 @@ class Game(gg.Game):
         self.player.enemies = self.enemies
         self.physics_system.add(self.player)
        
-        for i in range(5): 
+        for i in range(8): 
             self._add_enemy(gg.Vec2(50 + (i * 50), 100 + (i * 50)))
         # self._add_enemy(gg.Vec2(100, 100))
 
