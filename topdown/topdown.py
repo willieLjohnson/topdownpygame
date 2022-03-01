@@ -20,6 +20,12 @@ class Game(gg.Game):
         self.physics_system = gg.PhysicsSystem()
         self.decaying_system = gg.System([gg.Decaying])
         
+                
+        self._dead_entities = list()
+        self._decayed_entities = list()
+        self._finished_particle_fx = list()
+
+        
         self._add_wall(gg.Vec2(0, 0), gg.Vec2(10, 600))
         self._add_wall(gg.Vec2(10, 0), gg.Vec2(790, 10))
         self._add_wall(gg.Vec2(10, 200), gg.Vec2(100, 10))
@@ -28,22 +34,22 @@ class Game(gg.Game):
         self.player.layers = entity_layer
         self.player.enemies = self.enemies
         self.physics_system.add(self.player)
+        self.entities[self.player.id] = self.player
+        self.shield_size = 0
        
-        for i in range(9): 
-            self._add_enemy(gg.Vec2(50 + (i * 50), 100 + (i * 50)))
-        # self._add_enemy(gg.Vec2(100, 100))
-
-        # for i in range(10): 
-        #     self._add_block(gg.gen_vec2(100, 100, 10, 10), gg.Vec2(10, 10), gg.gen_color())
-
-        # self._add_block(gg.gen_vec2(100, 100, 10, 10), gg.Vec2(100, 100), self.style.NAVY)
- 
+        for i in range(3): 
+            self._add_enemy(gg.Vec2(1 + (i * 25), 1 + (i * 25)))
+     
         self.screen.camera = gg.Camera(self.player, self.screen.width, self.screen.height)
         follow = gg.Follow(self.screen.camera, self.player)
         self.screen.camera.setmethod(follow)
         
         self.space.damping = gg.World.DAMPING
-        
+    
+        # Setup the collision callback function
+        bullet_enemy_colhandler = self.space.add_default_collision_handler()
+        bullet_enemy_colhandler.begin = self._bullet_collides_enemy
+
         
     def run(self):
         self.running = 1
@@ -58,19 +64,19 @@ class Game(gg.Game):
             self.screen.clear(self.style.BLACK)
             self.screen.drawGrid()
             
-            self._finished_particle_fx = list()
             for id, particle_effect in self.particle_effects.items():
 
                 if particle_effect.completed:
-                    self._finished_particle_fx.append(id)
+                    self._finished_particle_fx.add(id)
                     continue
 
                 particle_effect.draw(self.screen)
                 particle_effect.update()
                 
-            self._dead_entities = list()
-            self._decayed_entities = list()
+     
             for entity in self.entities.values():
+                if entity.name == gg.PLAYER_NAME: continue
+                
                 player_pos = self.player.get_body().model.body.position
                 entity_pos = entity.get_component(gg.Body).position
                 distance = gg.Vec2(player_pos.x - entity_pos.x, player_pos.y - entity_pos.y).length()
@@ -82,35 +88,39 @@ class Game(gg.Game):
                 if distance < 100_000:
                     entity.update()
                 
-                print(distance)
                 if distance < self.screen.width:
                     self.screen.draw(entity)
                 stats = entity.get_component(gg.Stats)
                 if stats is not None:
                     if not stats.is_alive:
-                        self._dead_entities.append(entity)
+                        self._dead_entities.add(entity)
                         
                 decaying = entity.get_component(gg.Decaying)
                 if decaying is not None:
                     if decaying.is_dead:
-                        self._decayed_entities.append(entity)
+                        self._decayed_entities.add(entity)
 
             for entity in self._dead_entities:
+                ebody = entity.get_body()
                 del self.entities[entity.id]
                 self.physics_system.remove(entity)
+                self.space.remove(ebody.model.body, ebody.model.shape)
+            self._dead_entities = set()
+
 
 
             for entity in self._decayed_entities:
+                ebody = entity.get_body()
                 del self.entities[entity.id]
                 self.decaying_system.remove(entity)
                 self.physics_system.remove(entity)
-
-
+                self.space.remove(ebody.model.body, ebody.model.shape)
+            self._decayed_entities = set()
+            
             for id in self._finished_particle_fx:
                 del self.particle_effects[id]
+            self._finished_particle_fx = set()
             
-            print(len(self.entities))
-
             self.screen.draw(self.player)
 
             self.screen.update()
@@ -166,23 +176,36 @@ class Game(gg.Game):
 
             
         self.player.focusing = keys[pygame.K_LSHIFT]
-            
-        
+        pbody = self.player.get_body()
+        if self.player.focusing:
+            self.shield_size += 1 * delta
+        else:
+            if self.shield_size > 0:
+                self._add_projectile(shoot_dir, gg.Vec2(self.shield_size, 1 * self.shield_size * 0.01))
+                self.shield_size = 0
+
         if (abs(shoot_dir.x) > 0 or abs(shoot_dir.y) > 0) and self.player.can_shoot:
             self.player.shoot()
             self._add_projectile(shoot_dir)
 
 
     def _add_enemy(self, position): 
-        enemy = gg.Enemy(self, position, gg.Vec2(30,30))
-        self.enemies.add(enemy)
-        self.entities[enemy.id] = enemy
-        self.physics_system.add(enemy)
+
+        for i in range(gg.gen_intrange(2, 4)):
+            size = gg.Vec2(30, 30)
+            if gg.gen_intrange(1, 100) < 10:
+                size = gg.Vec2(40, 40)
+                
+            enemy = gg.Enemy(self, position * i, size)
+            self.enemies.add(enemy)
+            self.entities[enemy.id] = enemy
+            self.physics_system.add(enemy)
 
     def _add_wall(self, position, size):
         wall = gg.Wall(self, position, size)
         self.entities[wall.id] = wall
         self.physics_system.add(wall)
+        return wall
         
     def _add_block(self, position, size, color):
         shape = gg.Rectangle(self.space, position, size, color)
@@ -191,7 +214,7 @@ class Game(gg.Game):
         self.physics_system.add(block)
 
         
-    def _add_projectile(self, direction):
+    def _add_projectile(self, direction, size = gg.Vec2(10, 8)):
         pbody = self.player.get_body()
         pvelocity = pbody.velocity
         bullet_speed = self.player.get_weapon().bullet_speed
@@ -201,8 +224,43 @@ class Game(gg.Game):
         velocity += gg.Vec2(0, velocity.y)
 
         position = self.player.get_body().position + (direction * 10)
-        bullet = gg.Bullet(self, position, gg.Vec2(10, 8), pvelocity, velocity)
+        bullet = gg.Bullet(self, position, size, pvelocity, velocity)
         self.entities[bullet.id] = bullet
         self.physics_system.add(bullet)
         self.decaying_system.add(bullet)
     
+                
+    def _bullet_collides_enemy(self, arbiter, space, data):
+        entity_a = self.entities.get(arbiter.shapes[0].entity_id)
+        entity_b = self.entities.get(arbiter.shapes[1].entity_id)
+        
+        if entity_a is None or entity_b is None: return True
+        
+        acolor = entity_a.get_body().model.color
+        bcolor = entity_b.get_body().model.color 
+        
+        if entity_a.type == gg.BULLET_TYPE and entity_b.type == gg.ENEMY_TYPE:
+            entity_b.damage(10)
+            entity_b.change_color(gg.GGSTYLE.GREEN)
+
+            entity_a.get_decaying().current *= 0.9
+
+        elif entity_b.type == gg.BULLET_TYPE and entity_a.type == gg.ENEMY_TYPE:
+            entity_a.damage(10)
+            entity_a.change_color(gg.GGSTYLE.GREEN)
+
+            entity_b.get_decaying().current *= 0.9
+
+        elif entity_b.type == gg.ENEMY_TYPE and entity_a.type == gg.ENEMY_TYPE:
+            if not gg.Color.is_same_rgb(acolor, gg.GGSTYLE.YELLOW) and not gg.Color.is_same_rgb(acolor, gg.GGSTYLE.RED):
+                entity_a.change_color(gg.GGSTYLE.RED)
+            if not gg.Color.is_same_rgb(bcolor, gg.GGSTYLE.YELLOW) and not gg.Color.is_same_rgb(bcolor, gg.GGSTYLE.RED):
+                entity_b.change_color(gg.GGSTYLE.RED)
+
+        elif entity_b.type == gg.PLAYER_TYPE and entity_a.type == gg.ENEMY_TYPE:
+            entity_a.change_color(gg.GGSTYLE.YELLOW)
+        elif entity_a.type == gg.PLAYER_TYPE and entity_b.type == gg.ENEMY_TYPE:
+            entity_b.change_color(gg.GGSTYLE.YELLOW)
+        return True
+
+        
